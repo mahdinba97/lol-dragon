@@ -1,13 +1,12 @@
-import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'package:animate_do/animate_do.dart';
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import 'package:go_router/go_router.dart';
 import 'package:lol_dragon/context_extension.dart';
 import 'package:lol_dragon/core/utils/app_images.dart';
-import 'package:lol_dragon/router/app_router.dart';
 
-import '../../../router/app_routes.dart';
+import '../../items/presentation/items_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -17,19 +16,33 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final _bottomNavigationKey = GlobalKey();
-  int _page = 1;
-
   @override
   Widget build(BuildContext context) {
-    // final iconColor = context.theme.iconTheme.color;
     return Scaffold(
-      // bottomNavigationBar: buildNavBar(context, iconColor),
-      body: Padding(
-        padding: EdgeInsets.all(20.r).copyWith(top: 40.r),
+      body: Container(
+        decoration: const BoxDecoration(
+            image: DecorationImage(
+          image: AppImages.homeBackground,
+          fit: BoxFit.cover,
+        )),
+        padding: EdgeInsets.all(20.r),
         child: AnimationLimiter(
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  FadeIn(
+                    duration: const Duration(milliseconds: 800),
+                    child: Image(
+                      image: AppImages.leagueLogo,
+                      width: 150.w,
+                      height: 150.h,
+                    ),
+                  )
+                ],
+              ),
               ListView.builder(
                 shrinkWrap: true,
                 itemCount: 3,
@@ -40,19 +53,15 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: SlideAnimation(
                       verticalOffset: 40.0,
                       child: FadeInAnimation(
-                        child: buildItems()[index],
+                        child: Padding(
+                          padding: EdgeInsets.only(bottom: 5.h),
+                          child: buildItems()[index],
+                        ),
                       ),
                     ),
                   );
                 },
               ),
-              Spacer(),
-              Image(
-                image: AppImages.appIcon,
-                width: 100.w,
-                height: 100.h,
-              ),
-              SizedBox(height: 20.h)
             ],
           ),
         ),
@@ -60,98 +69,87 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  CurvedNavigationBar buildNavBar(BuildContext context, Color? iconColor) {
-    return CurvedNavigationBar(
-      backgroundColor: context.theme.colorScheme.background,
-      color: const Color(0xff3D4143),
-      key: _bottomNavigationKey,
-      index: _page,
-      items: [
-        Icon(Icons.add, size: 30, color: iconColor),
-        Icon(Icons.list, size: 30, color: iconColor),
-        Icon(Icons.compare_arrows, size: 30, color: iconColor),
-      ],
-      animationDuration: Duration(milliseconds: 400),
-      height: 60,
-      onTap: (index) {
-        setState(() {
-          _page = index;
-        });
-      },
-    );
-  }
-
-  Column buildBody(BuildContext context) {
-    return Column(
-      children: [],
-    );
-  }
-
   buildItems() {
     return [
-      Card(
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(10.r),
-          child: Container(
-            height: 100,
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AppImages.chmapBg,
-                fit: BoxFit.cover,
-                opacity: .5,
-              ),
-            ),
-            child: ListTile(
-              title: Text(
-                'Champions',
-              ),
-            ),
-          ),
+      OpenContainerWrapper(
+        openBuilder: (context, action) => const ItemsScreen(),
+        closedBuilder: (context, action) => const HomeCard(
+          image: AppImages.chmapBg,
+          title: 'Champions',
         ),
       ),
-      Card(
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(10.r),
-          child: Container(
-            height: 100,
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                opacity: .5,
-                image: AppImages.runeBg,
-                fit: BoxFit.cover,
-              ),
-            ),
-            child: ListTile(
-              title: Text(
-                'Runes',
-              ),
-            ),
-          ),
+      OpenContainerWrapper(
+        openBuilder: (context, action) => const ItemsScreen(),
+        closedBuilder: (context, action) => const HomeCard(
+          image: AppImages.runeBg,
+          title: 'Runes',
         ),
       ),
-      Card(
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(10.r),
-          child: Container(
-            height: 100,
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                opacity: .2,
-                image: AppImages.itemBg,
-                fit: BoxFit.cover,
-              ),
-            ),
-            child: GestureDetector(
-              onTap: () => appRouter.push(AppRoutes.items),
-              child: ListTile(
-                title: Text(
-                  'Items',
-                ),
-              ),
-            ),
-          ),
+      OpenContainerWrapper(
+        openBuilder: (context, action) => const ItemsScreen(),
+        closedBuilder: (context, action) => const HomeCard(
+          image: AppImages.itemBg,
+          title: 'items',
         ),
       ),
     ];
+  }
+}
+
+class HomeCard extends StatelessWidget {
+  const HomeCard({
+    super.key,
+    required this.image,
+    required this.title,
+  });
+
+  final ImageProvider image;
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(10.r),
+        child: Container(
+          height: 100,
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              opacity: .6,
+              image: image,
+              fit: BoxFit.cover,
+            ),
+          ),
+          child: ListTile(
+            title: Text(
+              title,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class OpenContainerWrapper extends StatefulWidget {
+  const OpenContainerWrapper({super.key, required this.closedBuilder, required this.openBuilder});
+  final CloseContainerBuilder closedBuilder;
+  final OpenContainerBuilder openBuilder;
+
+  @override
+  State<OpenContainerWrapper> createState() => _OpenContainerWrapperState();
+}
+
+class _OpenContainerWrapperState extends State<OpenContainerWrapper> {
+  @override
+  Widget build(BuildContext context) {
+    return OpenContainer(
+      openBuilder: widget.openBuilder,
+      closedColor: Colors.transparent,
+      middleColor: context.theme.colorScheme.background,
+      openColor: context.theme.colorScheme.background,
+      closedElevation: 0,
+      closedBuilder: widget.closedBuilder,
+    );
   }
 }
