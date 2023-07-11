@@ -8,6 +8,8 @@ class Item {
   Gold? gold;
   List<String>? from;
   List<String>? tags;
+  List<Item> toItems = [];
+  List<Item> fromItems = [];
   Maps? maps;
   Stats? stats;
 
@@ -29,36 +31,13 @@ class Item {
     description = json['description'];
     colloq = json['colloq'];
     plaintext = json['plaintext'];
-    into = json['into'] != null ? (json['into'] as List<dynamic>).toList().cast<String>() : null;
-    from = json['from'] != null ? (json['from'] as List<dynamic>).toList().cast<String>() : null;
+    into = json['into'] != null ? (json['into'] as List<dynamic>).toList().cast<String>() : [];
+    from = json['from'] != null ? (json['from'] as List<dynamic>).toList().cast<String>() : [];
     image = json['image'] != null ? ItemImage.fromJson(json['image']) : null;
     gold = json['gold'] != null ? Gold.fromJson(json['gold']) : null;
-    into = json['tags'] != null ? (json['tags'] as List<dynamic>).toList().cast<String>() : null;
+    tags = json['tags'] != null ? (json['tags'] as List<dynamic>).toList().cast<String>() : [];
     maps = json['maps'] != null ? Maps.fromJson(json['maps']) : null;
     stats = json['stats'] != null ? Stats.fromJson(json['stats']) : null;
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['name'] = name;
-    data['description'] = description;
-    data['colloq'] = colloq;
-    data['plaintext'] = plaintext;
-    data['into'] = into;
-    if (image != null) {
-      data['image'] = image!.toJson();
-    }
-    if (gold != null) {
-      data['gold'] = gold!.toJson();
-    }
-    data['tags'] = tags;
-    if (maps != null) {
-      data['maps'] = maps!.toJson();
-    }
-    if (stats != null) {
-      data['stats'] = stats!.toJson();
-    }
-    return data;
   }
 }
 

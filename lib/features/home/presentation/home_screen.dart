@@ -1,11 +1,13 @@
 import 'package:animate_do/animate_do.dart';
-import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lol_dragon/context_extension.dart';
 import 'package:lol_dragon/core/utils/app_images.dart';
+import 'package:lol_dragon/router/app_routes.dart';
 
+import '../../../core/widget/animated_open_container.dart';
 import '../../items/presentation/items_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -27,42 +29,24 @@ class _HomeScreenState extends State<HomeScreen> {
         )),
         padding: EdgeInsets.all(20.r),
         child: AnimationLimiter(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  FadeIn(
-                    duration: const Duration(milliseconds: 800),
-                    child: Image(
-                      image: AppImages.leagueLogo,
-                      width: 150.w,
-                      height: 150.h,
+          child: ListView.builder(
+            itemCount: 3,
+            itemBuilder: (BuildContext context, int index) {
+              return AnimationConfiguration.staggeredList(
+                delay: Duration(milliseconds: 100),
+                position: index,
+                duration: const Duration(milliseconds: 1000),
+                child: SlideAnimation(
+                  verticalOffset: 40.0,
+                  child: FadeInAnimation(
+                    child: Padding(
+                      padding: EdgeInsets.only(bottom: 5.h),
+                      child: buildItems()[index],
                     ),
-                  )
-                ],
-              ),
-              ListView.builder(
-                shrinkWrap: true,
-                itemCount: 3,
-                itemBuilder: (BuildContext context, int index) {
-                  return AnimationConfiguration.staggeredList(
-                    position: index,
-                    duration: const Duration(milliseconds: 1000),
-                    child: SlideAnimation(
-                      verticalOffset: 40.0,
-                      child: FadeInAnimation(
-                        child: Padding(
-                          padding: EdgeInsets.only(bottom: 5.h),
-                          child: buildItems()[index],
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ],
+                  ),
+                ),
+              );
+            },
           ),
         ),
       ),
@@ -71,25 +55,73 @@ class _HomeScreenState extends State<HomeScreen> {
 
   buildItems() {
     return [
-      OpenContainerWrapper(
+      AnimatedOpenContainer(
         openBuilder: (context, action) => const ItemsScreen(),
-        closedBuilder: (context, action) => const HomeCard(
-          image: AppImages.chmapBg,
-          title: 'Champions',
+        closedBuilder: (context, action) => Stack(
+          children: [
+            Positioned.fill(
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: const HomeCard(
+                  image: AppImages.chmapBg,
+                  title: 'Champions',
+                ),
+              ),
+            ),
+            Align(
+                alignment: Alignment.topRight,
+                child: Image(
+                  image: AppImages.caitChamp,
+                  height: 200,
+                  opacity: AlwaysStoppedAnimation(.8),
+                ))
+          ],
         ),
       ),
-      OpenContainerWrapper(
+      AnimatedOpenContainer(
         openBuilder: (context, action) => const ItemsScreen(),
-        closedBuilder: (context, action) => const HomeCard(
-          image: AppImages.runeBg,
-          title: 'Runes',
+        closedBuilder: (context, action) => Stack(
+          children: [
+            Positioned.fill(
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: const HomeCard(
+                  image: AppImages.chmapBg,
+                  title: 'Runes',
+                ),
+              ),
+            ),
+            Align(
+                alignment: Alignment.topRight,
+                child: Image(
+                  image: AppImages.redRune,
+                  height: 200,
+                  opacity: AlwaysStoppedAnimation(.7),
+                ))
+          ],
         ),
       ),
-      OpenContainerWrapper(
+      AnimatedOpenContainer(
         openBuilder: (context, action) => const ItemsScreen(),
-        closedBuilder: (context, action) => const HomeCard(
-          image: AppImages.itemBg,
-          title: 'items',
+        closedBuilder: (context, action) => Stack(
+          children: [
+            Positioned.fill(
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: const HomeCard(
+                  image: AppImages.chmapBg,
+                  title: 'Items',
+                ),
+              ),
+            ),
+            Align(
+                alignment: Alignment.topRight,
+                child: Image(
+                  image: AppImages.prawler,
+                  height: 200,
+                  opacity: AlwaysStoppedAnimation(.5),
+                ))
+          ],
         ),
       ),
     ];
@@ -112,44 +144,22 @@ class HomeCard extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(10.r),
         child: Container(
-          height: 100,
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              opacity: .6,
-              image: image,
-              fit: BoxFit.cover,
-            ),
-          ),
+          height: 150,
+          // decoration: BoxDecoration(
+          //   image: DecorationImage(
+          //     opacity: .6,
+          //     image: image,
+          //     fit: BoxFit.cover,
+          //   ),
+          // ),
           child: ListTile(
             title: Text(
               title,
+              style: TextStyle(fontWeight: FontWeight.w500, fontSize: 20.sp),
             ),
           ),
         ),
       ),
-    );
-  }
-}
-
-class OpenContainerWrapper extends StatefulWidget {
-  const OpenContainerWrapper({super.key, required this.closedBuilder, required this.openBuilder});
-  final CloseContainerBuilder closedBuilder;
-  final OpenContainerBuilder openBuilder;
-
-  @override
-  State<OpenContainerWrapper> createState() => _OpenContainerWrapperState();
-}
-
-class _OpenContainerWrapperState extends State<OpenContainerWrapper> {
-  @override
-  Widget build(BuildContext context) {
-    return OpenContainer(
-      openBuilder: widget.openBuilder,
-      closedColor: Colors.transparent,
-      middleColor: context.theme.colorScheme.background,
-      openColor: context.theme.colorScheme.background,
-      closedElevation: 0,
-      closedBuilder: widget.closedBuilder,
     );
   }
 }
